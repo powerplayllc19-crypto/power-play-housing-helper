@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="POWER PLAY Housing Helper - Generate dispute forms, verify METRO 2 compliance, and build your tenant advantage profile">
+    <meta name="theme-color" content="#0e6efb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="POWER PLAY">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="POWER PLAY">
+    <meta name="msapplication-TileColor" content="#0e6efb">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <title>POWER PLAY Housing Helper</title>
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+    
+    <!-- Fallback inline icons for when external files don't exist -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230e6efb' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='60' font-size='50' font-weight='bold' fill='white' text-anchor='middle'%3EPP%3C/text%3E%3C/svg%3E">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0e6efb;
+            --primary-dark: #0a4eb8;
+            --secondary: #9B59B6;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --light-gray: #f7f9fc;
+            --gray: #5b6473;
+            --dark-gray: #0e1726;
+            --border: #e0e6ed;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --radius: 12px;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Splash Screen */
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        #splash.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #splash svg {
+            width: 120px;
+            height: 120px;
+            animation: pulse 2s infinite;
+        }
+
+        #splash h1 {
+            color: white;
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        #splash p {
+            color: rgba(255,255,255,0.8);
+            margin-top: 10px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-brand svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(14, 110, 251, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Install Banner */
+        .install-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 12px 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .install-banner.show {
+            display: flex;
+        }
+
+        .install-banner p {
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .install-banner .btn {
+            background: white;
+            color: var(--primary);
+        }
+
+        .install-banner .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Main Content */
+        .main-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+            flex-direction: column;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        /* Card Component */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-gray);
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 8px;
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--danger);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: white;
+            -webkit-appearance: none;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(14, 110, 251, 0.1);
+        }
+
+        input:disabled, textarea:disabled, select:disabled {
+            background: var(--light-gray);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        input.error, textarea.error, select.error {
+            border-color: var(--danger);
+        }
+
+        .form-error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .form-help {
+            color: var(--gray);
+            font-size: 12px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* Checkbox & Radio */
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item, .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .checkbox-item:hover, .radio-item:hover {
+            background: var(--light-gray);
+        }
+
+        .checkbox-item input, .radio-item input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-item label, .radio-item label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideInUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-gray);
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        /* Stat Box */
+        .stat-box {
+            background: linear-gradient(135deg, #f7f9fc 0%, #eef4ff 100%);
+            padding: 20px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 4px;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            background: none;
+        }
+
+        .bottom-nav-item.active, .bottom-nav-item:hover {
+            color: var(--primary);
+        }
+
+        .bottom-nav-icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--light-gray);
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--dark-gray);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--light-gray);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-primary {
+            background: #e7f3ff;
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            background: var(--warning);
+            color: white;
+            padding: 8px 16px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .offline-indicator.show {
+            display: block;
+        }
+
+        /* Print Styles */
+        @media print {
+            .navbar, .bottom-nav, .install-banner {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 30px 16px;
+            }
+
+            .hero-title {
+                font-size: 24px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .navbar-actions .btn span {
+                display: none;
+            }
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light-gray: #1a1f2e;
+                --gray: #b0b7c3;
+                --dark-gray: #e8ecf1;
+                --border: #2d3748;
+            }
+
+            html, body {
+                background: #0f1419;
+                color: var(--dark-gray);
+            }
+
+            .card, .navbar, .bottom-nav {
+                background: #1a1f2e;
+                border-color: var(--border);
+            }
+
+            input, textarea, select {
+                background: #2d3748;
+                border-color: var(--border);
+                color: var(--dark-gray);
+            }
+
+            .modal {
+                background: rgba(0, 0, 0, 0.8);
+            }
+
+            .modal-content {
+                background: #1a1f2e;
+            }
+
+            .tab-btn {
+                color: var(--gray);
+            }
+
+            .alert-success {
+                background: #1e3a1f;
+                color: #90ee90;
+                border-color: #2d5a2d;
+            }
+
+            .alert-danger {
+                background: #3a1e1e;
+                color: #ff6b6b;
+                border-color: #5a2d2d;
+            }
+
+            .stat-box {
+                background: #2d3748;
+                border-left-color: var(--primary);
+            }
+
+            .badge {
+                background: #2d3748 !important;
+            }
+
+            #splash {
+                background: linear-gradient(135deg, #0a4eb8 0%, #6b3fa0 100%);
+            }
+        }
+
+        /* Manual Dark Mode Toggle */
+        body.dark-mode {
+            --light-gray: #1a1f2e;
+            --gray: #b0b7c3;
+            --dark-gray: #e8ecf1;
+            --border: #2d3748;
+            background: #0f1419;
+            color: var(--dark-gray);
+        }
+
+        body.dark-mode .card,
+        body.dark-mode .navbar,
+        body.dark-mode .bottom-nav {
+            background: #1a1f2e;
+            border-color: var(--border);
+        }
+
+        body.dark-mode input,
+        body.dark-mode textarea,
+        body.dark-mode select {
+            background: #2d3748;
+            border-color: var(--border);
+            color: var(--dark-gray);
+        }
+
+        body.dark-mode .modal-content {
+            background: #1a1f2e;
+        }
+
+        body.dark-mode .stat-box {
+            background: #2d3748;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mt-1 { margin-top: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mt-3 { margin-top: 24px; }
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+        .p-1 { padding: 8px; }
+        .p-2 { padding: 16px; }
+        .p-3 { padding: 24px; }
+        .gap-1 { gap: 8px; }
+        .gap-2 { gap: 16px; }
+        .gap-3 { gap: 24px; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .flex-1 { flex: 1; }
+        .hidden { display: none !important; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="white" width="100" height="100" rx="20"/>
+            <text x="50" y="60" font-size="50" font-weight="bold" fill="#0e6efb" text-anchor="middle">PP</text>
+        </svg>
+        <h1>POWER PLAY</h1>
+        <p>Housing Helper</p>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📡 You're offline. Some features may be limited.
+    </div>
+
+    <div id="app">
+        <!-- Install Banner -->
+        <div class="install-banner" id="installBanner">
+            <p>📲 Install POWER PLAY for quick access!</p>
+            <button class="btn btn-small" onclick="installPWA()">Install</button>
+            <button class="close-btn" onclick="dismissInstallBanner()">×</button>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect fill="currentColor" width="100" height="100" rx="20"/>
+                    <text x="50" y="60" font-size="50" font-weight="bold" fill="white" text-anchor="middle">PP</text>
+                </svg>
+                POWER PLAY
+            </div>
+            <div class="navbar-actions">
+                <button class="btn btn-secondary btn-small" onclick="showModal('aboutModal')">
+                    <span>About</span> ℹ️
+                </button>
+                <button class="btn btn-secondary btn-small" onclick="app.toggleTheme()" title="Toggle Dark Mode">
+                    🌙
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <div class="container">
+                <!-- Home Page -->
+                <div class="page active" id="homePage">
+                    <div class="hero">
+                        <h1 class="hero-title">Welcome to POWER PLAY</h1>
+                        <p class="hero-subtitle">Your Complete Housing Helper & Dispute Assistant</p>
+                        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 20px;">Empowering renters in Albuquerque & beyond with tools to challenge housing discrimination and build your tenant advantage</p>
+                        <button class="btn btn-secondary" onclick="app.navigateTo('formsPage')" style="margin: 0 auto;">Start Now →</button>
+                    </div>
+
+                    <div class="grid-3">
+                        <div class="card feature-card">
+                            <div class="feature-icon">📋</div>
+                            <div class="feature-title">Dispute Forms</div>
+                            <div class="feature-text">Create professional dispute letters for Equifax, Experian, and TransUnion</div>
+                        </div>
+                        <div class="card feature-card">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-title">METRO 2 Compliance</div>
+                            <div class="feature-text">Verify accuracy of credit data reporting standards</div>
+                        </div>
+                        <div class="card feature-card">
+                            <div class="feature-icon">⭐</div>
+                            <div class="feature-title">Tenant Profile</div>
+                            <div class="feature-text">Stand out with your tenant advantage profile</div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">📱 Install This App</h3>
+                        <div style="padding: 20px 0;">
+                            <p class="form-help" style="margin-bottom: 16px; font-size: 14px; font-style: normal;">
+                                Get quick access to POWER PLAY right from your home screen!
+                            </p>
+                            <div class="stat-box">
+                                <div style="font-weight: 700; color: var(--dark-gray); margin-bottom: 8px;">📱 On iPhone/iPad:</div>
+                                <p class="form-help">Tap the Share button → "Add to Home Screen"</p>
+                            </div>
+                            <div class="stat-box">
+                                <div style="font-weight: 700; color: var(--dark-gray); margin-bottom: 8px;">🤖 On Android:</div>
+                                <p class="form-help">Tap the menu (⋮) → "Install app" or "Add to Home Screen"</p>
+                            </div>
+                            <div class="stat-box">
+                                <div style="font-weight: 700; color: var(--dark-gray); margin-bottom: 8px;">💻 On Desktop:</div>
+                                <p class="form-help">Look for the install icon in your browser's address bar</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">How It Works</h3>
+                        <div style="padding: 20px 0;">
+                            <div class="stat-box">
+                                <div class="stat-label">Step 1</div>
+                                <div style="font-weight: 700; color: var(--dark-gray);">Choose Your Form Type</div>
+                                <p class="form-help">Select from housing-focused dispute forms</p>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Step 2</div>
+                                <div style="font-weight: 700; color: var(--dark-gray);">Fill Your Information</div>
+                                <p class="form-help">Complete the guided form with your details</p>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Step 3</div>
+                                <div style="font-weight: 700; color: var(--dark-gray);">Review & Generate</div>
+                                <p class="form-help">Check everything and create your PDF</p>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Step 4</div>
+                                <div style="font-weight: 700; color: var(--dark-gray);">Download & Submit</div>
+                                <p class="form-help">Print, email, or submit electronically</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">Resources</h3>
+                        <div style="padding: 20px 0;">
+                            <p class="form-help" style="margin-bottom: 12px;">📞 <strong>Need Help?</strong> Contact us at (505) 595-7861</p>
+                            <p class="form-help" style="margin-bottom: 12px;">📍 <strong>Location:</strong> Albuquerque, New Mexico</p>
+                            <p class="form-help">✉️ <strong>Email:</strong> info@powerplayhousinghelper.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forms Page -->
+                <div class="page" id="formsPage">
+                    <div class="card card-header">
+                        <div>
+                            <h2 class="card-title">Document Generator</h2>
+                            <p class="card-subtitle">Create professional dispute forms & compliance documents</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.navigateTo('homePage')">← Back</button>
+                    </div>
+
+                    <div class="grid-2" id="formsGrid">
+                        <!-- Forms will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Form Builder Page -->
+                <div class="page" id="formBuilderPage">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title" id="formTitle">Form Builder</h2>
+                                <p class="card-subtitle" id="formSubtitle">Complete all sections to generate your document</p>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="app.navigateTo('formsPage')">← Back</button>
+                        </div>
+
+                        <div class="tabs" id="formTabs">
+                            <!-- Tabs will be generated here -->
+                        </div>
+
+                        <div id="formContent">
+                            <!-- Form content will be generated here -->
+                        </div>
+
+                        <div class="flex gap-2 mt-3" style="justify-content: flex-end; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" onclick="app.resetForm()">Clear Form</button>
+                            <button class="btn btn-primary" onclick="app.generatePDF()">📥 Generate PDF</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget Calculator Page -->
+                <div class="page" id="budgetPage">
+                    <div class="card card-header">
+                        <div>
+                            <h2 class="card-title">Housing Budget Calculator</h2>
+                            <p class="card-subtitle">Plan your rental budget & calculate affordability</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.navigateTo('homePage')">← Back</button>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3 class="card-title">💵 Your Income</h3>
+                            <div class="form-group">
+                                <label for="monthlyIncome" class="required">Gross Monthly Income</label>
+                                <input type="number" id="monthlyIncome" placeholder="Enter amount" oninput="app.calculateBudget()">
+                            </div>
+                            <div class="form-group">
+                                <label for="otherIncome">Additional Monthly Income</label>
+                                <input type="number" id="otherIncome" placeholder="Side jobs, benefits, etc." oninput="app.calculateBudget()">
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">💸 Monthly Expenses</h3>
+                            <div class="form-group">
+                                <label for="utilities">Utilities (Est.)</label>
+                                <input type="number" id="utilities" placeholder="Electric, gas, water" oninput="app.calculateBudget()">
+                            </div>
+                            <div class="form-group">
+                                <label for="transportation">Transportation</label>
+                                <input type="number" id="transportation" placeholder="Car, gas, transit" oninput="app.calculateBudget()">
+                            </div>
+                            <div class="form-group">
+                                <label for="insurance">Insurance & Medical</label>
+                                <input type="number" id="insurance" placeholder="Health, auto, etc." oninput="app.calculateBudget()">
+                            </div>
+                            <div class="form-group">
+                                <label for="otherExpenses">Other Expenses</label>
+                                <input type="number" id="otherExpenses" placeholder="Food, phone, etc." oninput="app.calculateBudget()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">📊 Budget Analysis</h3>
+                        <div class="grid-2">
+                            <div class="stat-box">
+                                <div class="stat-label">Total Monthly Income</div>
+                                <div class="stat-value" id="totalIncome">$0</div>
+                            </div>
+                            <div class="stat-box" style="border-left-color: var(--danger);">
+                                <div class="stat-label">Total Expenses</div>
+                                <div class="stat-value" id="totalExpenses" style="color: var(--danger);">$0</div>
+                            </div>
+                            <div class="stat-box" style="border-left-color: var(--success);">
+                                <div class="stat-label">Available for Rent (30% Rule)</div>
+                                <div class="stat-value" id="rentBudget" style="color: var(--success);">$0</div>
+                            </div>
+                            <div class="stat-box" style="border-left-color: var(--warning);">
+                                <div class="stat-label">Maximum Recommended Rent</div>
+                                <div class="stat-value" id="maxRent" style="color: var(--warning);">$0</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <h4 style="color: var(--dark-gray); font-weight: 600; margin-bottom: 12px;">💡 Affordability Guidelines</h4>
+                            <p class="form-help"><strong>The 30% Rule:</strong> Housing costs should not exceed 30% of gross monthly income.</p>
+                            <p class="form-help"><strong>Safe Range:</strong> With remaining expenses, aim to rent at 25-30% of income.</p>
+                            <p class="form-help"><strong>Emergency Fund:</strong> Keep 3-6 months expenses in savings for security.</p>
+                        </div>
+
+                        <div id="budgetAlert" class="mt-2"></div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">📈 Tenant Screening Scores Impact</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>Credit Range</th>
+                                    <th>Impact</th>
+                                    <th>Recommendation</th>
+                                </tr>
+                                <tr>
+                                    <td>750+</td>
+                                    <td><span class="badge badge-success">Excellent</span></td>
+                                    <td>Best approval odds, negotiate rates</td>
+                                </tr>
+                                <tr>
+                                    <td>650-749</td>
+                                    <td><span class="badge badge-primary">Good</span></td>
+                                    <td>Standard approval, possible conditions</td>
+                                </tr>
+                                <tr>
+                                    <td>550-649</td>
+                                    <td><span class="badge badge-warning">Fair</span></td>
+                                    <td>May need co-signer or higher deposit</td>
+                                </tr>
+                                <tr>
+                                    <td>Below 550</td>
+                                    <td><span class="badge badge-danger">Poor</span></td>
+                                    <td>Use dispute forms to improve score first</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Page -->
+                <div class="page" id="progressPage">
+                    <div class="card card-header">
+                        <div>
+                            <h2 class="card-title">Your Progress</h2>
+                            <p class="card-subtitle">Track your forms and submissions</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.navigateTo('homePage')">← Back</button>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">📄 Forms Created</h3>
+                        <div id="progressList">
+                            <p class="form-help" style="text-align: center; padding: 20px; color: var(--gray);">No forms created yet. <a href="#" onclick="app.navigateTo('formsPage'); return false;" style="color: var(--primary); text-decoration: none;">Create your first form →</a></p>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">✅ Tips for Success</h3>
+                        <div class="stat-box">
+                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Document Everything</div>
+                            <p class="form-help">Keep copies of all disputes sent and responses received.</p>
+                        </div>
+                        <div class="stat-box">
+                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Follow Up</div>
+                            <p class="form-help">Send certified mail and track responses within 30-45 days.</p>
+                        </div>
+                        <div class="stat-box">
+                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Request Free Reports</div>
+                            <p class="form-help">Check your progress at annualcreditreport.com (free annually).</p>
+                        </div>
+                        <div class="stat-box">
+                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Stay Persistent</div>
+                            <p class="form-help">Improved credit takes time. Dispute errors immediately when found.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div class="page" id="settingsPage">
+                    <div class="card card-header">
+                        <div>
+                            <h2 class="card-title">Settings</h2>
+                            <p class="card-subtitle">Customize your experience</p>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="app.navigateTo('homePage')">← Back</button>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">🎨 Preferences</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="darkMode" onchange="app.toggleTheme()">
+                                <label for="darkMode">Dark Mode</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="autoSave" checked>
+                                <label for="autoSave">Auto-save Forms</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">💾 Data Management</h3>
+                        <div class="flex gap-2" style="flex-wrap: wrap;">
+                            <button class="btn btn-secondary flex-1" onclick="app.exportData()">📤 Export Data</button>
+                            <button class="btn btn-secondary flex-1" onclick="app.clearData()" style="border-color: var(--danger); color: var(--danger);">🗑️ Clear All Data</button>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">ℹ️ About This App</h3>
+                        <p class="form-help" style="margin-bottom: 12px;"><strong>POWER PLAY Housing Helper</strong></p>
+                        <p class="form-help" style="margin-bottom: 12px;">Version 1.0.0</p>
+                        <p class="form-help" style="margin-bottom: 12px;">📍 Albuquerque, New Mexico</p>
+                        <p class="form-help" style="margin-bottom: 12px;">© 2025 POWER PLAY Housing Resource Center</p>
+                        <p class="form-help" style="margin-bottom: 12px;">This is a free resource tool designed to help renters navigate credit disputes and tenant screening processes.</p>
+                        <button class="btn btn-primary w-full mt-2" onclick="showModal('aboutModal')">View Full Legal Notice</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="bottom-nav-item active" onclick="app.navigateTo('homePage')" data-page="homePage">
+                <div class="bottom-nav-icon">🏠</div>
+                <div>Home</div>
+            </button>
+            <button class="bottom-nav-item" onclick="app.navigateTo('formsPage')" data-page="formsPage">
+                <div class="bottom-nav-icon">📋</div>
+                <div>Forms</div>
+            </button>
+            <button class="bottom-nav-item" onclick="app.navigateTo('budgetPage')" data-page="budgetPage">
+                <div class="bottom-nav-icon">💰</div>
+                <div>Budget</div>
+            </button>
+            <button class="bottom-nav-item" onclick="app.navigateTo('progressPage')" data-page="progressPage">
+                <div class="bottom-nav-icon">📊</div>
+                <div>Progress</div>
+            </button>
+            <button class="bottom-nav-item" onclick="app.navigateTo('settingsPage')" data-page="settingsPage">
+                <div class="bottom-nav-icon">⚙️</div>
+                <div>Settings</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="hideModal('aboutModal')">×</button>
+            <h2 class="card-title">Legal Notice & Disclaimer</h2>
+            <div style="margin-top: 20px;">
+                <p class="form-help" style="margin-bottom: 12px;">
+                    <strong>IMPORTANT:</strong> This tool is provided for informational purposes only and does not constitute legal advice. 
+                </p>
+                <p class="form-help" style="margin-bottom: 12px;">
+                    The documents generated are templates based on Fair Credit Reporting Act (FCRA) requirements. 
+                    Always verify accuracy before submission and consider consulting with a legal professional.
+                </p>
+                <p class="form-help" style="margin-bottom: 12px;">
+                    <strong>Privacy:</strong> Your data is stored locally on your device. We do not collect or transmit personal information.
+                </p>
+                <p class="form-help" style="margin-bottom: 12px;">
+                    <strong>Accuracy:</strong> We strive for accuracy but cannot guarantee the information will result in successful disputes.
+                </p>
+                <p class="form-help" style="margin-bottom: 12px;">
+                    <strong>Contact:</strong> For questions or support, reach out to (505) 595-7861
+                </p>
+                <p class="form-help">
+                    By using this service, you agree to review all generated documents carefully and verify their accuracy before submission.
+                </p>
+            </div>
+            <button class="btn btn-primary w-full mt-3" onclick="hideModal('aboutModal')">Understood</button>
+        </div>
+    </div>
+
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed'));
+            });
+        }
+
+        // Main Application
+        const app = {
+            currentPage: 'homePage',
+            currentForm: null,
+            formData: {},
+            deferredPrompt: null,
+            
+            forms: [
+                {
+                    id: 'equifax',
+                    title: 'Equifax Housing Dispute',
+                    subtitle: 'Challenge rental & eviction errors',
+                    icon: '📋',
+                    color: '#FF6B6B',
+                    tabs: ['Personal Info', 'Dispute Details', 'Supporting Docs'],
+                    fields: {
+                        'Personal Info': [
+                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
+                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
+                            { name: 'ssn', label: 'Social Security Number (XXX-XX-XXXX)', type: 'text', required: true },
+                            { name: 'email', label: 'Email Address', type: 'email', required: true },
+                            { name: 'phone', label: 'Phone Number', type: 'tel', required: true },
+                            { name: 'address', label: 'Current Address', type: 'text', required: true },
+                            { name: 'city', label: 'City', type: 'text', required: true },
+                            { name: 'state', label: 'State', type: 'text', required: true },
+                            { name: 'zip', label: 'ZIP Code', type: 'text', required: true },
+                        ],
+                        'Dispute Details': [
+                            { name: 'disputeType', label: 'Type of Dispute', type: 'select', required: true, options: ['Eviction Record', 'Rental Debt', 'Criminal Record', 'Identity Error'] },
+                            { name: 'accountNumber', label: 'Account Number (if applicable)', type: 'text' },
+                            { name: 'creditorName', label: 'Creditor/Company Name', type: 'text' },
+                            { name: 'reason', label: 'Reason for Dispute', type: 'textarea', required: true, rows: 4 },
+                            { name: 'explanation', label: 'Detailed Explanation', type: 'textarea', required: true, rows: 5 },
+                        ],
+                        'Supporting Docs': [
+                            { name: 'hasProof', label: 'Will include proof of payment', type: 'checkbox' },
+                            { name: 'hasDismissal', label: 'Will include court dismissal', type: 'checkbox' },
+                            { name: 'hasSettlement', label: 'Will include settlement letter', type: 'checkbox' },
+                        ]
+                    }
+                },
+                {
+                    id: 'metro2',
+                    title: 'METRO 2 Compliance Check',
+                    subtitle: 'Verify credit reporting accuracy',
+                    icon: '✓',
+                    color: '#9B59B6',
+                    tabs: ['Personal Info', 'Institution Info', 'Account Data', 'Disputes'],
+                    fields: {
+                        'Personal Info': [
+                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
+                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
+                            { name: 'ssn', label: 'Social Security Number', type: 'text', required: true },
+                            { name: 'email', label: 'Email', type: 'email', required: true },
+                            { name: 'phone', label: 'Phone', type: 'tel', required: true },
+                        ],
+                        'Institution Info': [
+                            { name: 'institutionName', label: 'Reporting Institution', type: 'text', required: true },
+                            { name: 'metro2Code', label: 'METRO 2 Subscriber Code', type: 'text', required: true },
+                            { name: 'reportFrequency', label: 'Report Frequency', type: 'select', options: ['Monthly', 'Quarterly', 'Annually'] },
+                        ],
+                        'Account Data': [
+                            { name: 'accountNumber', label: 'Account Number', type: 'text', required: true },
+                            { name: 'accountType', label: 'Account Type', type: 'text' },
+                            { name: 'accountStatus', label: 'Status', type: 'select', options: ['Open', 'Closed', 'Delinquent'] },
+                            { name: 'openDate', label: 'Opening Date', type: 'date' },
+                        ],
+                        'Disputes': [
+                            { name: 'fieldName', label: 'Field in Question', type: 'text', required: true },
+                            { name: 'reportedValue', label: 'Currently Reported', type: 'text', required: true },
+                            { name: 'correctValue', label: 'What it Should Be', type: 'text', required: true },
+                            { name: 'concern', label: 'Your Concern', type: 'textarea', rows: 3 },
+                        ]
+                    }
+                },
+                {
+                    id: 'experian',
+                    title: 'Experian Screening Dispute',
+                    subtitle: 'Challenge tenant screening errors',
+                    icon: '🔍',
+                    color: '#4ECDC4',
+                    tabs: ['Personal Info', 'Dispute Info'],
+                    fields: {
+                        'Personal Info': [
+                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
+                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
+                            { name: 'ssn', label: 'Social Security Number', type: 'text', required: true },
+                            { name: 'email', label: 'Email', type: 'email', required: true },
+                            { name: 'phone', label: 'Phone', type: 'tel', required: true },
+                            { name: 'address', label: 'Current Address', type: 'text', required: true },
+                            { name: 'city', label: 'City', type: 'text', required: true },
+                            { name: 'state', label: 'State', type: 'text', required: true },
+                            { name: 'zip', label: 'ZIP Code', type: 'text', required: true },
+                        ],
+                        'Dispute Info': [
+                            { name: 'screeningCompany', label: 'Screening Company Name', type: 'text' },
+                            { name: 'screeningIssue', label: 'What is the issue?', type: 'textarea', required: true, rows: 4 },
+                            { name: 'desiredOutcome', label: 'What outcome do you seek?', type: 'textarea', rows: 3 },
+                        ]
+                    }
+                },
+                {
+                    id: 'transunion',
+                    title: 'TransUnion Dispute',
+                    subtitle: 'Correct rental history errors',
+                    icon: '🏠',
+                    color: '#45B7D1',
+                    tabs: ['Personal Info', 'Dispute Info'],
+                    fields: {
+                        'Personal Info': [
+                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
+                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
+                            { name: 'ssn', label: 'Social Security Number', type: 'text', required: true },
+                            { name: 'email', label: 'Email', type: 'email', required: true },
+                            { name: 'phone', label: 'Phone', type: 'tel' },
+                            { name: 'address', label: 'Current Address', type: 'text', required: true },
+                            { name: 'city', label: 'City', type: 'text', required: true },
+                            { name: 'state', label: 'State', type: 'text', required: true },
+                            { name: 'zip', label: 'ZIP Code', type: 'text', required: true },
+                        ],
+                        'Dispute Info': [
+                            { name: 'rentalHistory', label: 'Describe the rental history error', type: 'textarea', required: true, rows: 4 },
+                            { name: 'correctInfo', label: 'What is the correct information?', type: 'textarea', required: true, rows: 3 },
+                        ]
+                    }
+                },
+                {
+                    id: 'tenant-profile',
+                    title: 'Tenant Advantage Profile',
+                    subtitle: 'Stand out in screening software',
+                    icon: '⭐',
+                    color: '#0e6efb',
+                    tabs: ['Basic Info', 'Strengths', 'References'],
+                    fields: {
+                        'Basic Info': [
+                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
+                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
+                            { name: 'email', label: 'Email', type: 'email', required: true },
+                            { name: 'phone', label: 'Phone', type: 'tel' },
+                            { name: 'currentAddress', label: 'Current Address', type: 'text' },
+                        ],
+                        'Strengths': [
+                            { name: 'strengths', label: 'Your best qualities as a tenant', type: 'textarea', rows: 4 },
+                            { name: 'employmentStatus', label: 'Employment Status', type: 'select', options: ['Employed Full-time', 'Employed Part-time', 'Self-employed', 'Student', 'Retired'] },
+                            { name: 'monthlyIncome', label: 'Monthly Income', type: 'text' },
+                            { name: 'yearsAtJob', label: 'Years at Current Job', type: 'text' },
+                        ],
+                        'References': [
+                            { name: 'previousLandlord', label: 'Previous Landlord Name & Contact', type: 'textarea', rows: 3 },
+                            { name: 'employerRef', label: 'Employer Reference', type: 'textarea', rows: 3 },
+                            { name: 'personalRef', label: 'Personal Reference', type: 'textarea', rows: 3 },
+                        ]
+                    }
+                }
+            ],
+
+            init() {
+                // Hide splash after load
+                setTimeout(() => {
+                    document.getElementById('splash').classList.add('hidden');
+                }, 1500);
+
+                this.loadFromStorage();
+                this.renderForms();
+                this.setupPWA();
+                this.setupOfflineDetection();
+            },
+
+            setupPWA() {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    
+                    // Show install banner if not dismissed before
+                    if (!localStorage.getItem('installBannerDismissed')) {
+                        document.getElementById('installBanner').classList.add('show');
+                    }
+                });
+
+                window.addEventListener('appinstalled', () => {
+                    this.deferredPrompt = null;
+                    document.getElementById('installBanner').classList.remove('show');
+                });
+            },
+
+            setupOfflineDetection() {
+                const updateOnlineStatus = () => {
+                    const indicator = document.getElementById('offlineIndicator');
+                    if (!navigator.onLine) {
+                        indicator.classList.add('show');
+                    } else {
+                        indicator.classList.remove('show');
+                    }
+                };
+
+                window.addEventListener('online', updateOnlineStatus);
+                window.addEventListener('offline', updateOnlineStatus);
+                updateOnlineStatus();
+            },
+
+            navigateTo(page) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(page).classList.add('active');
+                this.currentPage = page;
+                
+                document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === page) item.classList.add('active');
+                });
+
+                document.querySelector('.main-container').scrollTop = 0;
+            },
+
+            renderForms() {
+                const grid = document.getElementById('formsGrid');
+                grid.innerHTML = this.forms.map(form => `
+                    <div class="card" style="border-left: 4px solid ${form.color}">
+                        <div style="font-size: 32px; margin-bottom: 12px;">${form.icon}</div>
+                        <h3 class="card-title">${form.title}</h3>
+                        <p class="card-subtitle" style="margin-bottom: 16px;">${form.subtitle}</p>
+                        <button class="btn btn-primary w-full" onclick="app.startForm('${form.id}')">Create Form →</button>
+                    </div>
+                `).join('');
+            },
+
+            startForm(formId) {
+                this.currentForm = this.forms.find(f => f.id === formId);
+                this.formData = {};
+                this.renderFormBuilder();
+                this.navigateTo('formBuilderPage');
+            },
+
+            renderFormBuilder() {
+                const form = this.currentForm;
+                document.getElementById('formTitle').textContent = form.title;
+                document.getElementById('formSubtitle').textContent = form.subtitle;
+                
+                const tabs = document.getElementById('formTabs');
+                tabs.innerHTML = form.tabs.map((tab, idx) => `
+                    <button class="tab-btn ${idx === 0 ? 'active' : ''}" onclick="app.switchTab(this, '${tab}')">${tab}</button>
+                `).join('');
+
+                const content = document.getElementById('formContent');
+                content.innerHTML = form.tabs.map((tab, idx) => `
+                    <div class="tab-content ${idx === 0 ? 'active' : ''}" id="tab-${tab.replace(/\s/g, '-')}">
+                        ${this.renderTabFields(form.fields[tab])}
+                    </div>
+                `).join('');
+            },
+
+            renderTabFields(fields) {
+                return `<div class="form-row">${fields.map(field => {
+                    let input = '';
+                    
+                    if (field.type === 'select') {
+                        input = `<select name="${field.name}" ${field.required ? 'required' : ''}>
+                            <option value="">Select ${field.label}</option>
+                            ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                        </select>`;
+                    } else if (field.type === 'textarea') {
+                        input = `<textarea name="${field.name}" placeholder="Enter ${field.label.toLowerCase()}" rows="${field.rows || 3}" ${field.required ? 'required' : ''}></textarea>`;
+                    } else if (field.type === 'checkbox') {
+                        return `
+                            <div class="form-group full">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="${field.name}" id="${field.name}">
+                                    <label for="${field.name}">${field.label}</label>
+                                </div>
+                            </div>
+                        `;
+                    } else if (field.type === 'date') {
+                        input = `<input type="date" name="${field.name}" ${field.required ? 'required' : ''}>`;
+                    } else {
+                        input = `<input type="${field.type}" name="${field.name}" placeholder="Enter ${field.label.toLowerCase()}" ${field.required ? 'required' : ''}>`;
+                    }
+
+                    return `
+                        <div class="form-group">
+                            <label for="${field.name}" ${field.required ? 'class="required"' : ''}>${field.label}</label>
+                            ${input}
+                        </div>
+                    `;
+                }).join('')}</div>`;
+            },
+
+            switchTab(btn, tabName) {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(`tab-${tabName.replace(/\s/g, '-')}`).classList.add('active');
+            },
+
+            generatePDF() {
+                const inputs = document.querySelectorAll('#formContent input, #formContent textarea, #formContent select');
+                const formData = {};
+                
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox') {
+                        formData[input.name] = input.checked ? 'Yes' : 'No';
+                    } else if (input.value) {
+                        formData[input.name] = input.value;
+                    }
+                });
+
+                if (!this.validateForm(formData)) return;
+
+                const html = this.createPDF(formData);
+                this.saveForm(formData);
+                this.downloadPDF(html);
+            },
+
+            validateForm(data) {
+                const requiredFields = [];
+                this.currentForm.tabs.forEach(tab => {
+                    this.currentForm.fields[tab].forEach(f => {
+                        if (f.required && (!data[f.name] || data[f.name] === 'No')) {
+                            requiredFields.push(f.label);
+                        }
+                    });
+                });
+
+                if (requiredFields.length > 0) {
+                    alert(`Please fill in all required fields:\n\n• ${requiredFields.join('\n• ')}`);
+                    return false;
+                }
+                return true;
+            },
+
+            createPDF(data) {
+                return `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>${this.currentForm.title}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px; }
+                            h1 { color: #0e6efb; border-bottom: 3px solid #0e6efb; padding-bottom: 10px; }
+                            h2 { color: #1945a5; margin-top: 30px; }
+                            .section { margin-bottom: 20px; page-break-inside: avoid; }
+                            .field { margin: 10px 0; padding: 12px; background: #f7f9fc; border-radius: 4px; border-left: 3px solid #0e6efb; }
+                            .label { font-weight: bold; color: #0e1726; display: block; margin-bottom: 4px; }
+                            .value { color: #5b6473; }
+                            .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #ccc; font-size: 12px; color: #666; }
+                            .legal { background: #fff6e6; padding: 15px; border-radius: 4px; margin-top: 30px; font-size: 12px; border: 1px solid #ffd9a8; }
+                            .signature { margin-top: 40px; border-top: 1px solid #333; width: 300px; padding-top: 8px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${this.currentForm.title}</h1>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <p><strong>Document ID:</strong> PP-${Date.now().toString(36).toUpperCase()}</p>
+                        
+                        ${Object.entries(data).map(([key, value]) => `
+                            <div class="field">
+                                <span class="label">${this.formatLabel(key)}:</span>
+                                <span class="value">${value}</span>
+                            </div>
+                        `).join('')}
+
+                        <div class="signature">
+                            <p>Signature: _______________________________</p>
+                            <p>Date: _______________________________</p>
+                        </div>
+
+                        <div class="legal">
+                            <strong>Legal Notice:</strong> This document is provided for informational purposes. The information above is certified to be true and accurate to the best of my knowledge. I understand that providing false information may result in legal consequences. This tool does not constitute legal advice.
+                        </div>
+
+                        <div class="footer">
+                            <p><strong>POWER PLAY Housing Resource Center</strong></p>
+                            <p>Albuquerque, New Mexico | (505) 595-7861</p>
+                            <p>© 2025 All rights reserved</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+            },
+
+            formatLabel(str) {
+                return str.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+            },
+
+            downloadPDF(html) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                setTimeout(() => {
+                    printWindow.print();
+                }, 250);
+            },
+
+            saveForm(data) {
+                const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
+                forms.unshift({
+                    id: Date.now(),
+                    type: this.currentForm.title,
+                    icon: this.currentForm.icon,
+                    data: data,
+                    date: new Date().toLocaleDateString()
+                });
+                localStorage.setItem('savedForms', JSON.stringify(forms));
+                this.updateProgressList();
+            },
+
+            updateProgressList() {
+                const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
+                const list = document.getElementById('progressList');
+                
+                if (forms.length === 0) {
+                    list.innerHTML = '<p class="form-help" style="text-align: center; padding: 20px;">No forms created yet. <a href="#" onclick="app.navigateTo(\'formsPage\'); return false;" style="color: var(--primary);">Create your first form →</a></p>';
+                    return;
+                }
+
+                list.innerHTML = `
+                    <div class="table-responsive">
+                        <table>
+                            <tr>
+                                <th>Form Type</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                            ${forms.map((form, idx) => `
+                                <tr>
+                                    <td>${form.icon} ${form.type}</td>
+                                    <td>${form.date}</td>
+                                    <td>
+                                        <button class="btn btn-small btn-secondary" onclick="app.viewForm(${idx})">View</button>
+                                        <button class="btn btn-small btn-secondary" onclick="app.deleteForm(${idx})" style="border-color: var(--danger); color: var(--danger);">×</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            },
+
+            viewForm(idx) {
+                const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
+                const form = forms[idx];
+                const html = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>${form.type}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; max-width: 800px; margin: 0 auto; }
+                            h1 { color: #0e6efb; }
+                            .field { margin: 10px 0; padding: 12px; background: #f7f9fc; border-radius: 4px; border-left: 3px solid #0e6efb; }
+                            .label { font-weight: bold; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${form.type}</h1>
+                        <p>Created: ${form.date}</p>
+                        ${Object.entries(form.data).map(([key, value]) => `
+                            <div class="field">
+                                <span class="label">${this.formatLabel(key)}:</span> ${value}
+                            </div>
+                        `).join('')}
+                    </body>
+                    </html>
+                `;
+                const win = window.open('', '_blank');
+                win.document.write(html);
+                win.document.close();
+            },
+
+            deleteForm(idx) {
+                if (confirm('Delete this form?')) {
+                    const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
+                    forms.splice(idx, 1);
+                    localStorage.setItem('savedForms', JSON.stringify(forms));
+                    this.updateProgressList();
+                }
+            },
+
+            resetForm() {
+                if (confirm('Clear all form data?')) {
+                    document.querySelectorAll('#formContent input, #formContent textarea, #formContent select').forEach(el => {
+                        el.value = '';
+                        if (el.type === 'checkbox') el.checked = false;
+                    });
+                }
+            },
+
+            calculateBudget() {
+                const income = parseFloat(document.getElementById('monthlyIncome').value) || 0;
+                const other = parseFloat(document.getElementById('otherIncome').value) || 0;
+                const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+                const transport = parseFloat(document.getElementById('transportation').value) || 0;
+                const insurance = parseFloat(document.getElementById('insurance').value) || 0;
+                const otherExp = parseFloat(document.getElementById('otherExpenses').value) || 0;
+
+                const totalIncome = income + other;
+                const totalExpenses = utilities + transport + insurance + otherExp;
+                const rentBudget = totalIncome * 0.3;
+                const maxRent = Math.max(rentBudget - totalExpenses, 0);
+
+                document.getElementById('totalIncome').textContent = '$' + totalIncome.toLocaleString('en-US', {minimumFractionDigits: 2});
+                document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toLocaleString('en-US', {minimumFractionDigits: 2});
+                document.getElementById('rentBudget').textContent = '$' + rentBudget.toLocaleString('en-US', {minimumFractionDigits: 2});
+                document.getElementById('maxRent').textContent = '$' + maxRent.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+                const alertDiv = document.getElementById('budgetAlert');
+                if (totalIncome > 0) {
+                    const ratio = (rentBudget / totalIncome * 100).toFixed(0);
+                    if (maxRent > 500) {
+                        alertDiv.innerHTML = `<div class="alert alert-success"><div class="alert-icon">✅</div><div><strong>Good news!</strong> Based on your income, you can comfortably afford up to $${maxRent.toLocaleString('en-US', {minimumFractionDigits: 2})} in rent.</div></div>`;
+                    } else if (maxRent > 0) {
+                        alertDiv.innerHTML = `<div class="alert alert-warning"><div class="alert-icon">⚠️</div><div><strong>Tight budget.</strong> Consider reducing expenses or finding roommates to increase your rental budget.</div></div>`;
+                    } else {
+                        alertDiv.innerHTML = `<div class="alert alert-danger"><div class="alert-icon">🚨</div><div><strong>Budget concern.</strong> Your expenses exceed your rental budget. Use our dispute forms to improve your credit for better housing options.</div></div>`;
+                    }
+                } else {
+                    alertDiv.innerHTML = '';
+                }
+            },
+
+            toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDark);
+                document.getElementById('darkMode').checked = isDark;
+            },
+
+            exportData() {
+                const data = {
+                    forms: JSON.parse(localStorage.getItem('savedForms') || '[]'),
+                    exportDate: new Date().toISOString(),
+                    version: '1.0.0'
+                };
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `powerplay-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+
+            clearData() {
+                if (confirm('Delete ALL saved forms? This cannot be undone.')) {
+                    localStorage.removeItem('savedForms');
+                    this.updateProgressList();
+                    alert('All data cleared successfully.');
+                }
+            },
+
+            loadFromStorage() {
+                this.updateProgressList();
+                
+                // Load dark mode preference
+                const darkMode = localStorage.getItem('darkMode') === 'true';
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('darkMode').checked = true;
+                }
+            }
+        };
+
+        // Global functions
+        function showModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function hideModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function installPWA() {
+            if (app.deferredPrompt) {
+                app.deferredPrompt.prompt();
+                app.deferredPrompt.userChoice.then((result) => {
+                    if (result.outcome === 'accepted') {
+                        document.getElementById('installBanner').classList.remove('show');
+                    }
+                    app.deferredPrompt = null;
+                });
+            }
+        }
+
+        function dismissInstallBanner() {
+            document.getElementById('installBanner').classList.remove('show');
+            localStorage.setItem('installBannerDismissed', 'true');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
