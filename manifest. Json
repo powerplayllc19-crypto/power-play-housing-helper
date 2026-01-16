@@ -1,43 +1,46 @@
 {
   "name": "POWER PLAY Housing Helper",
   "short_name": "POWER PLAY",
-  "description": "Generate dispute forms, verify METRO 2 compliance, and build your tenant advantage profile",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "Credit dispute forms, budget calculator, and housing resources",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0e6efb",
-  "orientation": "portrait-primary",
-  "categories": ["utilities", "productivity", "finance"],
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjElEQVR4nO2WP0vDQBjGn0uKBQVxcHBwEhcHQXDRr+Dg4ODo5ODgJA4ODkLB0U/g4CAiDg4ODg5+AEEQBKGDgyAIDkIR/FPxXuRCmnqXtCZN/cEDgdzd+zy/vLm7ANu2/RcCcALAIwCfACoAlrW7rN2H9jOu/V4AONYA6QAYAS8BuNCeMW3bh7Ylgpk6IXMABv1+M8z4uPEzuiaXAA74zXmNHzN+RgdAUwQzuieXNGfUB8BQrBPG8vMA7HoBGNU7YSyfBmDXC8CY/gVjecgLwKRhJl7UcxWACU0bNczEs7ongCm9E8byCQCmPQFM650wlgcBSBkAJDVtQuNTACQNABb1LhjLgwCkDQCSGp/S+IxmswTAogFAQuOTGp/V/CUAFg0BxDU+rvF5zV8GYFETIE7zcY0vafwqAKsaADGaj2l8VePXAFj3ABjR+IjGNzR+E4AtD4BhjQ9rfEvjtwHY9QDY0/gdjd8HYN8HwAEAhwAcAXAMwAkApwCcAXAOwIX2XGr3lXZfG+d/q+3/gwDAF3dXvuTC6uMMAAAAAElFTkSuQmCC",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjElEQVR4nO2WP0vDQBjGn0uKBQVxcHBwEhcHQXDRr+Dg4ODo5ODgJA4ODkLB0U/g4CAiDg4ODg5+AEEQBKGDgyAIDkIR/FPxXuRCmnqXtCZN/cEDgdzd+zy/vLm7ANu2/RcCcALAIwCfACoAlrW7rN2H9jOu/V4AONYA6QAYAS8BuNCeMW3bh7Ylgpk6IXMABv1+M8z4uPEzuiaXAA74zXmNHzN+RgdAUwQzuieXNGfUB8BQrBPG8vMA7HoBGNU7YSyfBmDXC8CY/gVjecgLwKRhJl7UcxWACU0bNczEs7ongCm9E8byCQCmPQFM650wlgcBSBkAJDVtQuNTACQNABb1LhjLgwCkDQCSGp/S+IxmswTAogFAQuOTGp/V/CUAFg0BxDU+rvF5zV8GYFETIE7zcY0vafwqAKsaADGaj2l8VePXAFj3ABjR+IjGNzR+E4AtD4BhjQ9rfEvjtwHY9QDY0/gdjd8HYN8HwAEAhwAcAXAMwAkApwCcAXAOwIX2XGr3lXZfG+d/q+3/gwDAF3dXvuTC6uMMAAAAAElFTkSuQmCC",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjElEQVR4nO2WP0vDQBjGn0uKBQVxcHBwEhcHQXDRr+Dg4ODo5ODgJA4ODkLB0U/g4CAiDg4ODg5+AEEQBKGDgyAIDkIR/FPxXuRCmnqXtCZN/cEDgdzd+zy/vLm7ANu2/RcCcALAIwCfACoAlrW7rN2H9jOu/V4AONYA6QAYAS8BuNCeMW3bh7Ylgpk6IXMABv1+M8z4uPEzuiaXAA74zXmNHzN+RgdAUwQzuieXNGfUB8BQrBPG8vMA7HoBGNU7YSyfBmDXC8CY/gVjecgLwKRhJl7UcxWACU0bNczEs7ongCm9E8byCQCmPQFM650wlgcBSBkAJDVtQuNTACQNABb1LhjLgwCkDQCSGp/S+IxmswTAogFAQuOTGp/V/CUAFg0BxDU+rvF5zV8GYFETIE7zcY0vafwqAKsaADGaj2l8VePXAFj3ABjR+IjGNzR+E4AtD4BhjQ9rfEvjtwHY9QDY0/gdjd8HYN8HwAEAhwAcAXAMwAkApwCcAXAOwIX2XGr3lXZfG+d/q+3/gwDAF3dXvuTC6uMMAAAAAElFTkSuQmCC",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ],
+  "categories": ["finance", "utilities", "productivity"],
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Create Form",
+      "name": "Forms",
       "short_name": "Forms",
-      "description": "Create a new dispute form",
-      "url": "./index.html#forms",
-      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+      "description": "Create dispute forms",
+      "url": "/?screen=forms",
+      "icons": []
     },
     {
-      "name": "Budget Calculator",
+      "name": "Budget",
       "short_name": "Budget",
-      "description": "Calculate your housing budget",
-      "url": "./index.html#budget",
-      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+      "description": "Budget calculator",
+      "url": "/?screen=budget",
+      "icons": []
     }
   ]
 }
